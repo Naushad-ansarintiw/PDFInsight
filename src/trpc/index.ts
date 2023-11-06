@@ -14,7 +14,7 @@ export const appRouter = router({
             // console.log("he");
             throw new TRPCError({ code: "UNAUTHORIZED" });
         }
-        console.log("hell");
+        // console.log("hell");
         // check if the user is in the database
         const dbuser = await db.user.findFirst({
             where: {
@@ -43,10 +43,25 @@ export const appRouter = router({
             }
         });
     }),
+    getFile: privateProcedure
+        .input(z.object({ key: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const {userId} = ctx;
+
+            const file = await db.file.findFirst({
+                where: {
+                    key: input.key,
+                    userId,
+                }
+            });
+
+            if(!file) throw new TRPCError({code: "NOT_FOUND"});
+            return file;
+        }),
     deleteFile: privateProcedure.input(
-        z.object({id: z.string()})
-    ).mutation(async ({ctx, input}) => {
-        const {userId} = ctx;
+        z.object({ id: z.string() })
+    ).mutation(async ({ ctx, input }) => {
+        const { userId } = ctx;
 
         const datafile = await db.file.findFirst({
             where: {
@@ -55,7 +70,7 @@ export const appRouter = router({
             },
         });
 
-        if(!datafile) throw new TRPCError({code: "NOT_FOUND"});
+        if (!datafile) throw new TRPCError({ code: "NOT_FOUND" });
         await db.file.delete({
             where: {
                 id: input.id,
