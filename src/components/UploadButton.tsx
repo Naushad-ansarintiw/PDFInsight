@@ -43,7 +43,7 @@ const UploadDropzone = () => {
     const [uploadProgress, setUploadProgress] = useState<number>(0);
     const { toast } = useToast();
 
-    const { startUpload } = useUploadThing("pdfUploader");
+    const { startUpload,  } = useUploadThing("pdfUploader");
 
     const { mutate: startPolling } = trpc.getFile.useMutation({
         onSuccess: (file) => {
@@ -77,7 +77,13 @@ const UploadDropzone = () => {
 
             // handle file uploading
             const res = await startUpload(acceptedFiles);
-
+            // if(res !== undefined && res[0].size > 4194304){
+            //     return toast({
+            //         title: "File size exceed 4MB",
+            //         description: "Subscribe to Premieum to Continue",
+            //         variant: "default"
+            //     })
+            // }
             if (!res) {
                 return toast({
                     title: "Something went wrong",
@@ -129,13 +135,18 @@ const UploadDropzone = () => {
 
                             {isUploading ? (
                                 <div className="w-full mt-4 max-w-xs mx-auto ">
-                                    <Progress value={uploadProgress} className='h-1 w-full bg-zinc-200' />
+                                    <Progress
+                                        indicatorColor={
+                                            uploadProgress === 100 ? 'bg-green-500' : ''
+                                        }
+                                        value={uploadProgress}
+                                        className='h-1 w-full bg-zinc-200' />
                                     {uploadProgress === 100 ? (
                                         <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2">
-                                            <Loader2 className="h-3 w-3 animate-spin"/>
+                                            <Loader2 className="h-3 w-3 animate-spin" />
                                             Redirecting...
                                         </div>
-                                    ): null}
+                                    ) : null}
                                 </div>
                             ) : null}
                             <input
