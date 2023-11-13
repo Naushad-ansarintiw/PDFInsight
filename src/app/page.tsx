@@ -65,7 +65,7 @@ export default function Home() {
           <div className="mx-auto max-w-2xl sm:text-center">
             <h2 className="mt-2 font-bold text-4xl text-gray-900 sm:text-5xl">Start chatting in minutes.</h2>
             <p className="mt-4 text-lg text-gray-600">
-              Chatting to you pdf files has been easier with brandname
+              Chatting to your pdf files has been easier with brandname
             </p>
           </div>
         </div>
