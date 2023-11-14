@@ -1,21 +1,37 @@
-"use client"
-import { ChevronDown, ChevronUp, Loader2, RotateCw, Search } from "lucide-react";
-import { Document, Page, pdfjs } from "react-pdf";
+'use client'
 
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
-import { useToast } from "./ui/use-toast";
-import { useResizeDetector } from "react-resize-detector";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { cn } from "@/lib/utils";
-import { DropdownMenuTrigger, DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "./ui/dropdown-menu";
-import SimpleBar from "simplebar-react";
-import PdfFullscreen from "./PdfFullscreen";
+import {
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  RotateCw,
+  Search,
+} from 'lucide-react'
+import { Document, Page, pdfjs } from 'react-pdf'
+
+import 'react-pdf/dist/Page/AnnotationLayer.css'
+import 'react-pdf/dist/Page/TextLayer.css'
+import { useToast } from './ui/use-toast'
+
+import { useResizeDetector } from 'react-resize-detector'
+import { Button } from './ui/button'
+import { Input } from './ui/input'
+import { useState } from 'react'
+
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { cn } from '@/lib/utils'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu'
+
+import SimpleBar from 'simplebar-react'
+import PdfFullscreen from './PdfFullscreen'
 
 
 interface PdfRendererProps {
@@ -34,6 +50,9 @@ const PdfRenderer = ({ url }: PdfRendererProps) => {
   const [currPage, setCurrPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1);
   const [rotation, setRotation] = useState<number>(0);
+  const [renderedScale, setRenderedScale] = useState<number | null>(null);
+  const isLoading = renderedScale !== scale; // if we change a scale then keep oldpage until new ones fully load 
+
 
   const CustomPageValidator = z.object({
     page: z.string().refine((num) => Number(num) > 0 && Number(num) <= numPages!)
@@ -131,21 +150,21 @@ const PdfRenderer = ({ url }: PdfRendererProps) => {
           </DropdownMenu>
 
           {/* Rotatate Button  */}
-          <Button variant="ghost" aria-label="rotate-90-deg" 
+          <Button variant="ghost" aria-label="rotate-90-deg"
             onClick={() => setRotation((prev) => prev + 90)}
           >
-            <RotateCw className="h-4 w-4"/>
+            <RotateCw className="h-4 w-4" />
           </Button>
 
           {/* FUll Screen Mode Pdf */}
-          <PdfFullscreen />
+          <PdfFullscreen fileUrl={url} />
         </div>
 
       </div>
 
       {/* Pdf Render */}
       <div className="flex-1 w-full max-h-screen">
-        <SimpleBar autoHide={false} className="max-h-[calc(100vh-rem)]">
+        <SimpleBar autoHide={false} className="max-h-[calc(100vh-10rem)]">
           <div ref={ref}>
             <Document loading={
               <div className="flex justify-center">
@@ -163,7 +182,24 @@ const PdfRenderer = ({ url }: PdfRendererProps) => {
                 setNumPages(numPages);
               }}
               file={url} className="max-h-full">
-              <Page width={width ? width : 1} pageNumber={currPage} scale={scale} rotate={rotation} />
+              {
+                isLoading && renderedScale ? <Page key={"@" + renderedScale} width={width ? width : 1} pageNumber={currPage} scale={scale} rotate={rotation} /> : null  // keeping the old page for avoid flickering
+              }
+              <Page 
+                className={cn(isLoading ? "hidden": "")}
+                width={width ? width : 1} 
+                pageNumber={currPage} 
+                scale={scale} 
+                rotate={rotation} 
+                key={"@" + scale}
+                loading={
+                  <div className='flex justify-center'>
+                    <Loader2 className='my-24 h-6 w-6 animate-spin' />
+                  </div>
+                }
+                onRenderSuccess={() => setRenderedScale(scale)} // now laading is finished display this page
+              />
+
             </Document>
           </div>
         </SimpleBar>
