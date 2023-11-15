@@ -97,17 +97,3 @@ export const appRouter = router({
 // NOT the router itself.
 export type AppRouter = typeof appRouter;
 
-
-// app-index.js:31 TRPCClientError: [
-//     {
-//       "code": "invalid_type",
-//       "expected": "string",
-//       "received": "undefined",
-//       "path": [
-//         "fileId"
-//       ],
-//       "message": "Required"
-//     }
-//   ]
-//       at TRPCClientError.from (webpack-internal:///(app-pages-browser)/./node_modules/.pnpm/@trpc+client@10.43.0_@trpc+server@10.43.0/node_modules/@trpc/client/dist/TRPCClientError-0de4d231.mjs:31:20)
-//       at eval (webpack-internal:///(app-pages-browser)/./node_modules/.pnpm/@trpc+client@10.43.0_@trpc+server@10.43.0/node_modules/@trpc/client/dist/httpBatchLink-204206a5.mjs:198:105)

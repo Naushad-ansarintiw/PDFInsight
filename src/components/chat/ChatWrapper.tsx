@@ -2,8 +2,7 @@
 import { trpc } from "@/app/_trpc/client"
 import ChatInput from "./ChatInput"
 import Messages from "./Messages"
-import { ChevronLast, ChevronLeft, Loader2, XCircle } from "lucide-react"
-import { date } from "zod"
+import { ChevronLeft, Loader2, XCircle } from "lucide-react"
 import Link from "next/link"
 import { buttonVariants } from "../ui/button"
 
