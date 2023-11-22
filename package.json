@@ -31,6 +31,7 @@
     "date-fns": "^2.30.0",
     "langchain": "^0.0.150",
     "lucide-react": "^0.289.0",
+    "md5": "^2.3.0",
     "next": "13.5.6",
     "openai-edge": "1.2.2",
     "pdf-parse": "^1.1.1",
@@ -49,6 +50,7 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/md5": "^2.3.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

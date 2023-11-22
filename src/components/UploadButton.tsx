@@ -77,13 +77,6 @@ const UploadDropzone = () => {
 
             // handle file uploading
             const res = await startUpload(acceptedFiles);
-            // if(res !== undefined && res[0].size > 4194304){
-            //     return toast({
-            //         title: "File size exceed 4MB",
-            //         description: "Subscribe to Premieum to Continue",
-            //         variant: "default"
-            //     })
-            // }
             if (!res) {
                 return toast({
                     title: "Something went wrong",

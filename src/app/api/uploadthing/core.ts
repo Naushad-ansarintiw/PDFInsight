@@ -28,41 +28,29 @@ export const ourFileRouter = {
 
       try {
 
-        await loadPdfIntoPinecone(file.key); 
+        const pages = await loadPdfIntoPinecone(file.key); 
+        console.log(pages);
 
-        // // vectorize and index entire document 
-        // const pineconeIndex = pinecone.Index("pdfinsight");
-
-        // // doing semantic query
-        // const embeddings = new OpenAIEmbeddings({
-        //   openAIApiKey: process.env.OPENAI_API_KEY
-        // })
-  
-        // await PineconeStore.fromDocuments(pageContent, embeddings, {
-        //   pineconeIndex,
-        //   // namespace: createdFile.id
-        // })
-
-        // await db.file.update({
-        //   data: {
-        //     uploadStatus: "SUCCESS"
-        //   },
-        //   where: {
-        //     id: createdFile.id
-        //   }
-        // });
+        await db.file.update({
+          data: {
+            uploadStatus: "SUCCESS"
+          },
+          where: {
+            id: createdFile.id
+          }
+        });
 
       } catch (error) {
           console.log("Hel");
           console.log(error);
-          // await db.file.update({
-          //   data: {
-          //     uploadStatus: "FAILED"
-          //   },
-          //   where: {
-          //     id: createdFile.id
-          //   }
-          // })
+          await db.file.update({
+            data: {
+              uploadStatus: "FAILED"
+            },
+            where: {
+              id: createdFile.id
+            }
+          })
       }
     }),
 } satisfies FileRouter;
