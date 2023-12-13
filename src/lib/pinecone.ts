@@ -44,7 +44,7 @@ export async function loadPdfIntoPinecone(fileKey: string) {
         // 4.upload to pinecone;
         console.log("enter in 4");
         const client = await getPineconeClient();
-        const pineconeIndex = await client.Index("pdf");
+        const pineconeIndex = client.Index("pdf");
         console.log("done 4");
         console.log("inserting vector into pinecone");
         // const namespace = convertToAscii(fileKey);

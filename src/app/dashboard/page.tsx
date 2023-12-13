@@ -15,7 +15,6 @@ export default async function Page() {
             id: user.id
         }
     });
-
     if(!dbUser) {
         redirect('/auth-callback?origin=dashboard');
     }

@@ -5,13 +5,20 @@ import Messages from "./Messages"
 import { ChevronLeft, Loader2, XCircle } from "lucide-react"
 import Link from "next/link"
 import { buttonVariants } from "../ui/button"
+import { useChat } from 'ai/react'
+import React, { useEffect, useRef } from "react"
 
 interface ChatWrapperProps {
   fileId: string
 }
 
 const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
-  console.log(fileId);
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
+    api: "/api/message",
+    body: {
+      fileId: fileId
+    }
+  });
 
   const { data, isLoading } = trpc.getFileUploadStatus.useQuery({
     fileId,
@@ -62,13 +69,13 @@ const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
           <p className="text-zinc-500 text-sm">
             Your <span className="font-medium">Free</span>{' '} plan supports up to 5 pages per PDF.
           </p>
-          <Link 
-            href='/dashboard' 
+          <Link
+            href='/dashboard'
             className={buttonVariants({
               variant: "secondary",
               className: "mt-4"
             })}>
-            <ChevronLeft className="h-3 w-3 mr-1.5"/>Back
+            <ChevronLeft className="h-3 w-3 mr-1.5" />Back
           </Link>
         </div>
       </div>
@@ -76,18 +83,28 @@ const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
     </div>
   )
 
-
+  // Handling the scroll down whenever the messages changes:
+  // const messagesContainerRef = useRef<HTMLDivElement | null>(null);
+  // useEffect(()=> {
+  //   const messageContainer = document.getElementById('message-container');
+  //   if(messageContainer) {
+  //     messageContainer.scrollTo({
+  //       top: messageContainer.scrollHeight,
+  //       behavior: 'smooth'
+  //     });
+  //   }
+  // }, [messages]);
 
 
   return (
     <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
       {/* Messages */}
-      <div className="flex-1 justify-between flex flex-col mb-28">
-        <Messages />
+      <div className="flex-1 justify-between flex flex-col mb-28" id="message-container">
+        <Messages messages={messages} />
       </div>
 
       {/* chat input */}
-      <ChatInput />
+      <ChatInput input={input} handleInputChange={handleInputChange} handleSubmit={handleSubmit} />
     </div>
   )
 }

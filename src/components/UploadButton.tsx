@@ -136,7 +136,7 @@ const UploadDropzone = () => {
                                         className='h-1 w-full bg-zinc-200' />
                                     {uploadProgress === 100 ? (
                                         <div className="flex gap-1 items-center justify-center text-sm text-zinc-700 text-center pt-2">
-                                            <Loader2 className="h-3 w-3 animate-spin" />
+                                            <Loader2 className="h-3 wz-3 animate-spin" />
                                             Redirecting...
                                         </div>
                                     ) : null}
