@@ -7,6 +7,7 @@ import { Textarea } from "../ui/textarea"
 interface ChatInputProps {
   isDisabled?: boolean
   input?: string
+  // setInput?: React.Dispatch<React.SetStateAction<string>>
   handleInputChange?: (event: React.ChangeEvent<HTMLTextAreaElement>) => void
   handleSubmit?: (event: React.FormEvent<HTMLFormElement>) => void
 }
@@ -39,7 +40,9 @@ const ChatInput = ({isDisabled, input, handleInputChange, handleSubmit}: ChatInp
                 placeholder="Enter your question..." 
                 className="resize-none pr-12 text-base py-3 scrollbar-thumb-blue scrollbar-thumb-rounded scrollbar-track-blue-lighter scrollbar-w-2 scrolling-touch"
               />
-              <Button className="absolute bottom-1.5 right-[8px]"><Send aria-label="send message" className="h-4 w-4" type="submit"/></Button>
+              <Button 
+                disabled={isDisabled}
+                className="absolute bottom-1.5 right-[8px]"><Send aria-label="send message" className="h-4 w-4" type="submit"/></Button>
             </div>
           </div>
         </div>

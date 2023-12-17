@@ -6,14 +6,14 @@ import { ChevronLeft, Loader2, XCircle } from "lucide-react"
 import Link from "next/link"
 import { buttonVariants } from "../ui/button"
 import { useChat } from 'ai/react'
-import React, { useEffect, useRef } from "react"
+import React from "react"
 
 interface ChatWrapperProps {
   fileId: string
 }
 
 const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, setInput } = useChat({
     api: "/api/message",
     body: {
       fileId: fileId
@@ -100,7 +100,7 @@ const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
     <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
       {/* Messages */}
       <div className="flex-1 justify-between flex flex-col mb-28" id="message-container">
-        <Messages messages={messages} />
+        <Messages fileId={fileId}/>
       </div>
 
       {/* chat input */}

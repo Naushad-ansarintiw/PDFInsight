@@ -1,44 +1,3 @@
-// import { db } from "@/db";
-// import { SendMessageValidator } from "@/lib/validators/SendMessageValidator";
-// import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-// import { NextRequest } from "next/server";
-
-// export const POST = async (req: NextRequest) => {
-//     // endpoint for asking a question to a pdf file
-
-//     const body = await req.json();
-
-//     const {getUser} = getKindeServerSession();
-//     const user = getUser();
-
-//     const {id: userId} = user;
-
-//     if(!userId) return new Response("Unauthorized", {status: 401});
-
-//     const {fileId, message} = SendMessageValidator.parse(body);
-
-//     const file = await db.file.findFirst({
-//         where: {
-//             id: fileId,
-//             userId
-//         }
-//     });
-
-//     if(!file) return new Response("Not Found", {status: 404});
-
-//     await db.message.create({
-//         data: {
-//             text: message,
-//             isUserMessage: true,
-//             userId,
-//             fileId,
-//         }
-//     });
-
-//     // Answer to the question 
-
-// }
-
 import { db } from '@/db'
 import { getContext } from '@/lib/contextquery'
 import { getKindeServerSession } from '@kinde-oss/kinde-auth-nextjs/server'
@@ -65,8 +24,8 @@ export async function POST(req: Request) {
   if (!userId) return new Response("Unauthorized", { status: 401 });
 
   // Extract the `messages` from the body of the request
-  const { messages, fileId } = await req.json()
-  const lastMessage = messages[messages.length - 1];
+  const { messages, fileId } = await req.json();
+  const lastMessage: Message = messages[messages.length - 1];
   console.log(lastMessage);
 
   const file = await db.file.findFirst({
@@ -77,7 +36,16 @@ export async function POST(req: Request) {
 
   if (!file) return new Response("Not Found", { status: 404 });
 
-  const filekey = fileId;
+  await db.message.create({
+    data: {
+      text: lastMessage.content,
+      isUserMessage: true,
+      fileId,
+      userId
+    }
+  })
+
+  const filekey = file.id;
 
   const context = await getContext(lastMessage.content, filekey); // this return whole paragraph of relevent vector embeddings
   console.log(context, " question context");
@@ -110,7 +78,18 @@ export async function POST(req: Request) {
     stream: true,
   });
   // Convert the response into a friendly text-stream
-  const stream = OpenAIStream(response)
+  const stream = OpenAIStream(response, {
+    async onCompletion(completion) {
+      await db.message.create({
+        data: {
+          text: completion,
+          isUserMessage: false,
+          fileId,
+          userId,
+        },
+      })
+    },
+  })
   // Respond with the stream
   return new StreamingTextResponse(stream)
 }
