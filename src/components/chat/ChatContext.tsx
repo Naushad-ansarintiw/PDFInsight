@@ -5,14 +5,14 @@ import { useMutation } from "@tanstack/react-query"
 type ContextType = {
     addMessage: () => void,
     message: string,
-    handleInputChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void,
+    handleInputChangelocal: (event: React.ChangeEvent<HTMLTextAreaElement>) => void,
     isLoading: boolean,
 }
 
 export const ChatContext = createContext<ContextType>({
     addMessage: () => {},
     message: '',
-    handleInputChange: () => {},
+    handleInputChangelocal: () => {},
     isLoading: false,
 })
 
@@ -45,7 +45,7 @@ export const ChatContextProvider = ({fileId, children}: Props) => {
         }
     });
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const handleInputChangelocal = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setMessage(e.target.value);
     }
 
@@ -56,7 +56,7 @@ export const ChatContextProvider = ({fileId, children}: Props) => {
         <ChatContext.Provider value={{
             addMessage,
             message,
-            handleInputChange,
+            handleInputChangelocal,
             isLoading
         }}>
             {children}

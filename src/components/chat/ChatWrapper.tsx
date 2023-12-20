@@ -7,17 +7,30 @@ import Link from "next/link"
 import { buttonVariants } from "../ui/button"
 import { useChat } from 'ai/react'
 import React from "react"
+import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query"
 
 interface ChatWrapperProps {
   fileId: string
 }
 
 const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
-  const { messages, input, handleInputChange, handleSubmit, setInput } = useChat({
+
+  const {data: data1, isLoading: isLoading1, fetchNextPage} = trpc.getFileMessages.useInfiniteQuery({
+    fileId,
+    limit: INFINITE_QUERY_LIMIT,
+  }, {
+    getNextPageParam: (lastPage) => lastPage?.nextCursor,  // check for the last index message for loading new msg 
+    keepPreviousData: true
+  });
+
+  const previousMessage = data1?.pages.flatMap((page) => page?.messages); 
+
+  const { messages, input, handleInputChange, handleSubmit } = useChat({
     api: "/api/message",
     body: {
       fileId: fileId
-    }
+    },
+    initialMessages: previousMessage || []
   });
 
   const { data, isLoading } = trpc.getFileUploadStatus.useQuery({
@@ -28,6 +41,7 @@ const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
   }
   );
 
+  const messageContainerRef = useChatScroll(messages);
 
   if (isLoading)
     return (
@@ -83,24 +97,11 @@ const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
     </div>
   )
 
-  // Handling the scroll down whenever the messages changes:
-  // const messagesContainerRef = useRef<HTMLDivElement | null>(null);
-  // useEffect(()=> {
-  //   const messageContainer = document.getElementById('message-container');
-  //   if(messageContainer) {
-  //     messageContainer.scrollTo({
-  //       top: messageContainer.scrollHeight,
-  //       behavior: 'smooth'
-  //     });
-  //   }
-  // }, [messages]);
-
-
   return (
     <div className="relative min-h-full bg-zinc-50 flex divide-y divide-zinc-200 flex-col justify-between gap-2">
       {/* Messages */}
-      <div className="flex-1 justify-between flex flex-col mb-28" id="message-container">
-        <Messages fileId={fileId}/>
+      <div ref={messageContainerRef} className="flex-1 justify-between flex flex-col mb-28">
+        <Messages messages={messages} isLoading={isLoading1} />
       </div>
 
       {/* chat input */}
@@ -109,4 +110,16 @@ const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
   )
 }
 
+// Handling the scroll down logic
+function useChatScroll<T>(dep: T): React.MutableRefObject<HTMLDivElement> {
+  const ref = React.useRef<HTMLDivElement>(null!);
+  React.useEffect(() => {
+    if (ref.current) {
+      ref.current.scrollTop = ref.current.scrollHeight;
+    }
+  }, [dep]);
+  return ref;
+}
+
 export default ChatWrapper
+

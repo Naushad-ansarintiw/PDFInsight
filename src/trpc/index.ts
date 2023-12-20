@@ -68,14 +68,14 @@ export const appRouter = router({
                 fileId
             },
             orderBy: {
-                createdAt: "desc"
+                createdAt: "asc"
             },
             cursor: cursor ? { id: cursor } : undefined,
             select: {
                 id: true,
-                isUserMessage: true,
+                role: true,
                 createdAt: true,
-                text: true,
+                content: true,
             }
         });
         let nextCursor: typeof cursor | undefined = undefined;

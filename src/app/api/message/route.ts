@@ -38,8 +38,8 @@ export async function POST(req: Request) {
 
   await db.message.create({
     data: {
-      text: lastMessage.content,
-      isUserMessage: true,
+      content: lastMessage.content,
+      role: "user",
       fileId,
       userId
     }
@@ -82,8 +82,8 @@ export async function POST(req: Request) {
     async onCompletion(completion) {
       await db.message.create({
         data: {
-          text: completion,
-          isUserMessage: false,
+          content: completion,
+          role: "assistant",
           fileId,
           userId,
         },

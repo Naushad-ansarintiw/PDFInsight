@@ -5,10 +5,10 @@ type RouterOutput = inferRouterOutputs<AppRouter>
 
 type Messages = RouterOutput["getFileMessages"]["messages"];
 
-type OmitText = Omit<Messages[number], "text">
+type OmitText = Omit<Messages[number], "content" | "userId" | "fileId" | "updatedAt">
 
 type ExtendedText = {
-    text: string | JSX.Element;
+    content: string | JSX.Element;
 }
 
 export type ExtendedMessage = OmitText & ExtendedText;
