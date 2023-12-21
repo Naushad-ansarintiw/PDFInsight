@@ -1,5 +1,5 @@
 import Skeleton from 'react-loading-skeleton';
-import { Loader2, MessageSquare } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import IndividualMessage from './Message';
 import { Message } from 'ai';
 
@@ -25,7 +25,7 @@ const Messages = ({ messages, isLoading }: Props) => {
 
           return (
             <IndividualMessage
-              message={message}
+              message={message} 
               isNextMessageSamePerson={isNextMessageSamePerson}
               key={message.id}
             />
