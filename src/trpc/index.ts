@@ -50,6 +50,7 @@ export const appRouter = router({
     }),
     createStripeSession: privateProcedure.mutation(async({ctx}) =>{
         const {userId} = ctx;
+        console.log(userId);
         // in server side relative path not work so we have to use full path 
 
         const billingUrl = absoluteUrl("/dashboard/billing");
@@ -93,7 +94,7 @@ export const appRouter = router({
                 userId: userId,
             }
         })
-
+        
         return {url: stripeSession.url};
         
     }),
