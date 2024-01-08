@@ -4,12 +4,7 @@ import type Stripe from 'stripe'
 import { headers } from "next/headers";
 import type {  NextApiResponse } from "next";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  }
-};
-let cnt = 0;
+
 export async function POST(req: Request, res: NextApiResponse) {
   if (req.method !== "POST")
   return res.status(405).send("Only POST requests allowed");
@@ -27,12 +22,6 @@ export async function POST(req: Request, res: NextApiResponse) {
     )
   } catch (err: any) {
     return res.status(400).send(`Webhook Error: ${err.message}`);
-  }
-  if(cnt < 1){
-    console.log(event);
-    console.log(body);
-    
-    cnt++;
   }
   const session = event.data.object as Stripe.Checkout.Session
   console.log(session.metadata);
