@@ -8,6 +8,7 @@ import { buttonVariants } from "../ui/button"
 import { useChat } from 'ai/react'
 import React from "react"
 import { INFINITE_QUERY_LIMIT } from "@/config/infinite-query"
+import { Message } from "ai"
 
 interface ChatWrapperProps {
   fileId: string
@@ -15,7 +16,7 @@ interface ChatWrapperProps {
 
 const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
 
-  const {data: data1, isLoading: isLoading1, fetchNextPage} = trpc.getFileMessages.useInfiniteQuery({
+  const { data: data1, isLoading: isLoading1, fetchNextPage } = trpc.getFileMessages.useInfiniteQuery({
     fileId,
     limit: INFINITE_QUERY_LIMIT,
   }, {
@@ -23,14 +24,20 @@ const ChatWrapper = ({ fileId }: ChatWrapperProps) => {
     keepPreviousData: true
   });
 
-  const previousMessage = data1?.pages.flatMap((page) => page?.messages); 
+  const previousMessage = data1?.pages.flatMap((page) => page?.messages);
+
+  // Type assertion for the createdAt property
+  const updatedmessages = previousMessage?.map((message) => ({
+    ...message,
+    createdAt: new Date(message.createdAt),
+  })) || [];
 
   const { messages, input, handleInputChange, handleSubmit } = useChat({
     api: "/api/message",
     body: {
       fileId: fileId
     },
-    initialMessages: previousMessage || []
+    initialMessages: updatedmessages || []
   });
 
   const { data, isLoading } = trpc.getFileUploadStatus.useQuery({

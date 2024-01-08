@@ -52,7 +52,7 @@ const Message = ({ message, isNextMessageSamePerson }: MessageProps) => {
                             'text-blue-300': message.role === "user",
                         })}>
                             {format(
-                                new Date(message.createdAt),
+                                (message.createdAt!),
                                 'HH:mm'
                             )}
                         </div>
