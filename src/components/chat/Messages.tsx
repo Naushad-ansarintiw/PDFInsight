@@ -8,10 +8,6 @@ interface Props {
   isLoading: boolean;
 }
 
-enum Role {
-  User = 'user',
-  Assistant = 'assistant',
-}
 
 const Messages = ({ messages, isLoading }: Props) => {
 
