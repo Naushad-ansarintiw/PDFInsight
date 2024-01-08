@@ -6,8 +6,6 @@ const config = new Configuration({
 
 const openai = new OpenAIApi(config);
 
-const maxRetries = 3;
-let retries = 0;
 
 // convert the text into vector
 export async function getEmbeddings(text: string){

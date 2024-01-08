@@ -3,7 +3,6 @@ import { downloadPdf } from "./downloadPdf";
 import { Document, RecursiveCharacterTextSplitter } from "@pinecone-database/doc-splitter";
 import { getEmbeddings } from "./embeddings";
 import md5 from "md5";
-import { convertToAscii } from "./utils";
 
 let pinecone: PineconeClient | null = null;
 
@@ -48,7 +47,7 @@ export async function loadPdfIntoPinecone(fileKey: string) {
         console.log("done 4");
         console.log("inserting vector into pinecone");
         // const namespace = convertToAscii(fileKey);
-        PineconeUtils.chunkedUpsert(pineconeIndex, vectors, undefined , 10);
+        PineconeUtils.chunkedUpsert(pineconeIndex, vectors, '' , 10);
         return documents[0];
     } catch (error) {
         console.error("Error in loadPdfIntoPinecone:", error);
