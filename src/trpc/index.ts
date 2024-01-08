@@ -5,9 +5,9 @@ import { db } from '@/db';
 import { z } from "zod"
 import { INFINITE_QUERY_LIMIT } from '@/config/infinite-query';
 import { absoluteUrl } from '@/lib/utils';
-import { getUserSubscriptionPlan, stripe } from '@/lib/stripe';
+import {  stripe } from '@/lib/stripe';
 import { PLANS } from '@/config/stripe';
-import { useId } from 'react';
+import { NextResponse } from 'next/server';
 
 export const appRouter = router({
     authCallback: publicProcedure.query(async () => {
@@ -40,7 +40,7 @@ export const appRouter = router({
         return { success: true };
     }),
     getUserFiles: privateProcedure.query(async ({ ctx }) => {
-        const { userId, user } = ctx;
+        const { userId } = ctx;
 
         return await db.file.findMany({
             where: {
@@ -48,100 +48,113 @@ export const appRouter = router({
             }
         });
     }),
-    createStripeSession: privateProcedure.mutation(async({ctx}) =>{
-        const {userId} = ctx;
-        console.log(userId);
+    createStripeSession: privateProcedure.mutation(async ({ ctx }) => {
+        const { userId } = ctx;
+        console.log(userId, "CreateStripe");
+        const return_url = absoluteUrl("/");
+        const billingUrl = absoluteUrl("/dashboard/billing");
         // in server side relative path not work so we have to use full path 
 
-        const billingUrl = absoluteUrl("/dashboard/billing");
-
-        if(!userId) throw new TRPCError({code: "UNAUTHORIZED"});
-
-        const dbUser = await db.user.findFirst({
-            where: {
-                id: userId
+        try {
+            const { getUser } = getKindeServerSession();
+            const user = getUser();
+            if (!user) {
+                return new NextResponse('unauthorized', { status: 401 })
             }
-        });
 
-        if(!dbUser) throw new TRPCError({code: "UNAUTHORIZED"});
-        
-        const subscriptionPlan = await getUserSubscriptionPlan();
-
-        if(subscriptionPlan.isSubscribed && dbUser.stripeCustomerId) {
-            // they are already a customer
-            const stripeSession = await stripe.billingPortal.sessions.create({
-                customer: dbUser.stripeCustomerId,
-                return_url: billingUrl
-            });
-
-            return {url: stripeSession.url} // hosted page that stripe provide to manage a subscription 
-        }
-
-        // they are not customer yet
-        const stripeSession = await stripe.checkout.sessions.create({
-            success_url: billingUrl,
-            cancel_url: billingUrl,
-            payment_method_types: ['card'],
-            mode: "subscription",
-            billing_address_collection: 'auto',
-            line_items: [
-                {
-                    price: PLANS.find((plan) => plan.name === "Pro")?.price.priceIds.test,
-                    quantity: 1
+            const _userSubscription = await db.user.findFirst({
+                where: {
+                    id: userId
                 }
-            ],
-            metadata: {
-                userId: userId,
+            });
+            if (_userSubscription && _userSubscription.stripeCustomerId != null) {
+                // trying to cancel at the billing portal 
+                const stripeSession = await stripe.billingPortal.sessions.create({
+                    customer: _userSubscription.stripeCustomerId,
+                    return_url
+                })
+                return {url: stripeSession.url};
             }
-        })
-        
-        return {url: stripeSession.url};
-        
+
+            // user's first time trying to subscribe
+            const stripeSession = await stripe.checkout.sessions.create({
+              success_url: billingUrl,
+              cancel_url: billingUrl,
+              payment_method_types: ['card'],
+              mode: 'subscription',
+              billing_address_collection: 'auto',
+              client_reference_id: userId,
+              line_items: [
+                {
+                    price_data: {
+                        currency: 'inr',
+                        unit_amount: 10000,
+                        product_data: {
+                            name: "PdfInsight",
+                        },
+                        recurring: {
+                            interval: "month",
+                        }
+                    },
+                    quantity: 1,
+                }
+              ],
+              metadata: {
+                userId: userId,
+              },
+            })
+            console.log(stripeSession);
+
+            return {url: stripeSession.url};
+        } catch (error) {
+            console.log("stripe error ", error);
+            return new NextResponse("internal server error", { status: 500 })
+        }
     }),
     getFileMessages: privateProcedure
-    .input(
-        z.object({
-            limit: z.number().min(1).max(100).nullish(),
-            cursor: z.string().nullish(),
-            fileId: z.string()
-        })
-    ).query(async ({ ctx, input }) => {
-        const { userId } = ctx;
-        const { fileId, cursor } = input;
-        const limit = input.limit ?? INFINITE_QUERY_LIMIT
-        const file = await db.file.findFirst({
-            where: {
-                id: fileId,
-                userId
+        .input(
+            z.object({
+                limit: z.number().min(1).max(100).nullish(),
+                cursor: z.string().nullish(),
+                fileId: z.string()
+            })
+        ).query(async ({ ctx, input }) => {
+            const { userId } = ctx;
+            const { fileId, cursor } = input;
+            const limit = input.limit ?? INFINITE_QUERY_LIMIT
+            const file = await db.file.findFirst({
+                where: {
+                    id: fileId,
+                    userId
+                }
+            });
+            if (!file) throw new TRPCError({ code: 'NOT_FOUND' });
+            const messages = await db.message.findMany({
+                take: limit + 1,
+                where: {
+                    fileId
+                },
+                orderBy: {
+                    createdAt: "asc"
+                },
+                cursor: cursor ? { id: cursor } : undefined,
+                select: {
+                    id: true,
+                    role: true,
+                    createdAt: true,
+                    content: true,
+                }
+            });
+            let nextCursor: typeof cursor | undefined = undefined;
+            if (messages.length > limit) {
+                const nextItem = messages.pop();
+                nextCursor = nextItem?.id;
             }
-        });
-        if (!file) throw new TRPCError({ code: 'NOT_FOUND' });
-        const messages = await db.message.findMany({
-            take: limit + 1,
-            where: {
-                fileId
-            },
-            orderBy: {
-                createdAt: "asc"
-            },
-            cursor: cursor ? { id: cursor } : undefined,
-            select: {
-                id: true,
-                role: true,
-                createdAt: true,
-                content: true,
+            return {
+                messages,
+                nextCursor,
             }
-        });
-        let nextCursor: typeof cursor | undefined = undefined;
-        if (messages.length > limit) {
-            const nextItem = messages.pop();
-            nextCursor = nextItem?.id;
-        }
-        return {
-            messages,
-            nextCursor,
-        }
-    }),
+        }),
     getFileUploadStatus: privateProcedure
         .input(z.object({ fileId: z.string() }))
         .query(async ({ input, ctx }) => {
