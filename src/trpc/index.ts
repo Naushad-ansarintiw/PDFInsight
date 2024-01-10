@@ -77,33 +77,23 @@ export const appRouter = router({
             }
 
             // user's first time trying to subscribe
-            const stripeSession = await stripe.checkout.sessions.create({
-              success_url: billingUrl,
-              cancel_url: billingUrl,
-              payment_method_types: ['card'],
-              mode: 'subscription',
-              billing_address_collection: 'auto',
-              client_reference_id: userId,
-              line_items: [
-                {
-                    price_data: {
-                        currency: 'inr',
-                        unit_amount: 10000,
-                        product_data: {
-                            name: "PdfInsight",
-                        },
-                        recurring: {
-                            interval: "month",
-                        }
-                    },
-                    quantity: 1,
+            const stripeSession = await stripe.paymentLinks.create({
+                line_items: [
+                    {
+                        price: 'price_1OVTt1SAo6lzH3fcr02J9uYV',
+                        quantity: 1,
+                    }
+                ],
+                metadata: {
+                    userId
+                },
+                after_completion: {
+                    type: 'redirect',
+                    redirect: {
+                        url: 'https://localhost:3000/dashboard',
+                    }
                 }
-              ],
-              metadata: {
-                userId: userId,
-              },
-            })
-            console.log(stripeSession);
+            });
 
             return {url: stripeSession.url};
         } catch (error) {

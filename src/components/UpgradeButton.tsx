@@ -6,7 +6,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { useEffect } from "react";
 
 // recreating the `Stripe` object on every render.
-loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const asyncStripe =loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 const UpgradeButton = () => {
 
