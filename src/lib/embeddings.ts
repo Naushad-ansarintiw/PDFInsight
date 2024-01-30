@@ -1,22 +1,19 @@
-import {OpenAIApi, Configuration} from 'openai-edge'
+import OpenAI from 'openai';
 
-const config = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY
-})
-
-const openai = new OpenAIApi(config);
+// Create an OpenAI API client (that's edge friendly!)
+const openai = new OpenAI({
+  apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted
+});
 
 
 // convert the text into vector
 export async function getEmbeddings(text: string){
     try {
         console.log("ENTER in embeddings");
-        const response = await openai.createEmbedding({
+        const result = await openai.embeddings.create({
             model: 'text-embedding-ada-002',
             input: text.replace(/\n/g, ''),
         });
-        console.log(response.statusText + "fetch responce");
-        const result = await response.json();
         console.log('OpenAI API Response:');
         if (Array.isArray(result.data) && result.data.length > 0) {
             console.log("LEeaving");

@@ -1,22 +1,19 @@
-import { PrismaClient } from '@prisma/client/edge'
-import { withAccelerate } from '@prisma/extension-accelerate'
+import { PrismaClient } from '@prisma/client'
+// import { withAccelerate } from '@prisma/extension-accelerate'
 
 declare global {
   // eslint-disable-next-line no-var
-  var cachedPrisma: PrismaClient | undefined
+  var cachedPrisma: any
 }
 
-let prisma: PrismaClient
+let prisma;
 if (process.env.NODE_ENV === 'production') {
-  // @ts-ignore
-  prisma = new PrismaClient().$extends(withAccelerate())
+  prisma = new PrismaClient()
 } else {
-  if (!global.cachedPrisma) {
-    // @ts-ignore
-    global.cachedPrisma = new PrismaClient().$extends(withAccelerate())
-  }
-  // @ts-ignore
-  prisma = global.cachedPrisma
+  // if (!global.cachedPrisma) {
+  //   global.cachedPrisma = new PrismaClient().$extends(withAccelerate())
+  // }
+  prisma = new PrismaClient()
 }
 
 export const db = prisma

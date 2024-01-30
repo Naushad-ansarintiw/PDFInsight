@@ -8,8 +8,9 @@ import type { NextApiResponse } from "next";
 export async function POST(req: Request, res: NextApiResponse) {
   if (req.method !== "POST")
     return res.status(405).send("Only POST requests allowed");
-
+  
   const body = await req.text();
+  console.log(body);
   const signature = headers().get("Stripe-Signature") as string;
   let event: Stripe.Event;
   try {

@@ -25,6 +25,8 @@ export const ourFileRouter = {
           uploadStatus: "PROCESSING",
         }
       })
+      console.log("File CREated ", createdFile);
+      console.log(createdFile.url);
 
       try {
 
