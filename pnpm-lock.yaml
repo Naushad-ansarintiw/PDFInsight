@@ -66,8 +66,8 @@ dependencies:
     specifier: ^10.43.0
     version: 10.43.0
   '@uploadthing/react':
-    specifier: 5.6.1
-    version: 5.6.1(next@13.5.6)(react@18.2.0)(uploadthing@5.6.1)
+    specifier: 5.7.0
+    version: 5.7.0(next@13.5.6)(react@18.2.0)(uploadthing@5.7.4)
   ai:
     specifier: ^2.2.28
     version: 2.2.28(react@18.2.0)(solid-js@1.8.7)(svelte@4.2.8)(vue@3.3.11)
@@ -150,8 +150,8 @@ dependencies:
     specifier: ^1.0.7
     version: 1.0.7(tailwindcss@3.3.3)
   uploadthing:
-    specifier: 5.6.1
-    version: 5.6.1
+    specifier: 5.7.4
+    version: 5.7.4
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -1574,8 +1574,8 @@ packages:
     resolution: {integrity: sha512-ZUo1JHOPPMZDsUw1mOhhVDIvJGlsjj6T0xJ/YJtulyJwL43S9B5pxg1cHcRuTEgjaxj7B55jiqQ6r9mDrrjH9A==}
     dev: false
 
-  /@uploadthing/react@5.6.1(next@13.5.6)(react@18.2.0)(uploadthing@5.6.1):
-    resolution: {integrity: sha512-uVd4I26OudpUcikobDFBMl9mG0vlhdXmK57oidCIrvfgNfKZOehpW+pqe1nUWE8HoYquJ1iK4OrmrfX8hOK2MA==}
+  /@uploadthing/react@5.7.0(next@13.5.6)(react@18.2.0)(uploadthing@5.7.4):
+    resolution: {integrity: sha512-rSBzoC2eMRM2d6Mpis6RXfo1Y5JsV7oJanTmaVdltFLRxbO/4lwK1kvHM4qwDUvn01UpxBtcVayimMBXNJ0V8Q==}
     peerDependencies:
       next: '*'
       react: ^17.0.2 || ^18.0.0
@@ -1590,7 +1590,7 @@ packages:
       next: 13.5.6(react-dom@18.2.0)(react@18.2.0)
       react: 18.2.0
       tailwind-merge: 1.14.0
-      uploadthing: 5.6.1
+      uploadthing: 5.7.4
     transitivePeerDependencies:
       - '@uploadthing/mime-types'
     dev: false
@@ -5836,8 +5836,9 @@ packages:
       picocolors: 1.0.0
     dev: true
 
-  /uploadthing@5.6.1:
-    resolution: {integrity: sha512-lWVMCoAmZ33mahV6NS7oW+eQl++jnYEuaR3zh9PlrEt6P8lkl3GPDUE5iWywBx+pK9HewIqZvaZXQvzKOjOlMg==}
+  /uploadthing@5.7.4:
+    resolution: {integrity: sha512-8pTPznWTUlvWRxwWME2Eo6A1VcpvjskRcxzx7aQ45yPjh1yVFZ9RUKG1sjBTNSJCArMdbeg5wlhJT5S2XGr/8Q==}
+    engines: {node: '>=18.13.0'}
     dependencies:
       '@uploadthing/mime-types': 0.2.2
       '@uploadthing/shared': 5.2.7(@uploadthing/mime-types@0.2.2)

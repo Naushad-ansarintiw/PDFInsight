@@ -161,6 +161,7 @@ export const appRouter = router({
         .input(z.object({ key: z.string() }))
         .mutation(async ({ ctx, input }) => {
             const { userId } = ctx;
+            console.log(userId, input, );
 
             const file = await db.file.findFirst({
                 where: {

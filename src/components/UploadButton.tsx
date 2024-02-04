@@ -87,6 +87,7 @@ const UploadDropzone = () => {
             }
 
             const [fileResponse] = res;  // first element in res --> fileResponse
+            console.log(res, "Uploadting")
             const key = fileResponse?.key;
 
             if (!key) {
